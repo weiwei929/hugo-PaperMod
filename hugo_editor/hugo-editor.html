@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hugo Markdown Editor</title>
+    
+    <!-- 图片管理器样式 -->
+    <link rel="stylesheet" href="image-manager.css">
+    <!-- 图片库样式 -->
+    <link rel="stylesheet" href="image-gallery.css">
+    <!-- 图片使用场景样式 -->
+    <link rel="stylesheet" href="image-usage.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar-section h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .tag {
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-toolbar {
+            background: white;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .editor-content {
+            flex: 1;
+            display: flex;
+        }
+
+        .editor-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-pane textarea {
+            flex: 1;
+            border: none;
+            padding: 20px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        .preview-pane {
+            flex: 1;
+            background: white;
+            border-left: 1px solid #ddd;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .preview-content {
+            max-width: none;
+            line-height: 1.6;
+        }
+
+        .preview-content h1,
+        .preview-content h2,
+        .preview-content h3,
+        .preview-content h4,
+        .preview-content h5,
+        .preview-content h6 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            color: #2c3e50;
+        }
+
+        .preview-content p {
+            margin-bottom: 16px;
+        }
+
+        .preview-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .preview-content blockquote {
+            border-left: 4px solid #3498db;
+            padding-left: 16px;
+            margin: 16px 0;
+            color: #666;
+            font-style: italic;
+        }
+
+        .preview-content code {
+            background: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .preview-content pre {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        .image-upload {
+            margin-top: 10px;
+        }
+
+        .image-upload input[type="file"] {
+            display: none;
+        }
+
+        .image-upload-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #27ae60;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .image-upload-btn:hover {
+            background: #229954;
+        }
+
+        .uploaded-images {
+            margin-top: 15px;
+        }
+
+        .image-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+
+        .image-item img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .image-item .info {
+            flex: 1;
+            font-size: 12px;
+        }
+
+        .image-item .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .image-item .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .status-bar {
+            background: #34495e;
+            color: white;
+            padding: 5px 20px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: #e74c3c;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .split-toggle {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .split-toggle.active {
+            background: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📝 Hugo Markdown Editor</h1>
+        <div class="header-actions">
+            <button onclick="newDocument()" class="btn btn-primary">
+                📄 新建文档
+            </button>
+            <button onclick="loadDocument()" class="btn btn-primary">
+                📂 加载文档
+            </button>
+            <button onclick="showMarkdownValidator()" class="btn btn-primary">
+                🔍 文档验证
+            </button>
+            <button onclick="exportToHugo()" class="btn btn-success">
+                🚀 导出Hugo
+            </button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3>📋 文档信息</h3>
+                <div class="form-group">
+    <!-- 图片库容器，修复 image-gallery.js 报错 -->
+    <div id="imageGallery"></div>
+                    <label for="title">标题</label>
+                    <input type="text" id="title" placeholder="请输入文章标题">
+                </div>
+                <div class="form-group">
+                    <label for="contentType">内容类型</label>
+                    <select id="contentType" onchange="updateFormByType()">
+                        <option value="post">普通文章</option>
+                        <option value="diary">日志</option>
+                        <option value="novel">小说章节</option>
+                        <option value="photo">图片文章</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="description">描述</label>
+                    <textarea id="description" placeholder="文章简介或摘要"></textarea>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>🏷️ 分类标签</h3>
+                <div class="form-group">
+                    <label for="categories">分类</label>
+                    <input type="text" id="categories" placeholder="输入分类，回车添加">
+                    <div class="tags-input" id="categoriesTags"></div>
+                </div>
+                <div class="form-group">
+                    <label for="tags">标签</label>
+                    <input type="text" id="tags" placeholder="输入标签，回车添加">
+                    <div class="tags-input" id="tagsTags"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>⚙️ 页面设置</h3>
+                <div class="form-group">
+                    <label for="coverImage">封面图片</label>
+                    <input type="text" id="coverImage" placeholder="封面图片路径（自动设置）" readonly>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="draft">
+                    <label for="draft">草稿状态</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="toc" checked>
+                    <label for="toc">显示目录</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="comments" checked>
+                    <label for="comments">允许评论</label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="showShareButtons" checked>
+                    <label for="showShareButtons">显示分享按钮</label>
+                </div>
+            </div>
+
+            <div class="sidebar-section" id="specialFields">
+                <!-- 动态内容区域 -->
+            </div>
+
+            <div class="sidebar-section">
+                <h3>🖼️ 图片管理</h3>
+                <div class="image-upload">
+                    <label for="imageFile" class="image-upload-btn">📁 选择图片</label>
+                    <input type="file" id="imageFile" accept="image/*" multiple onchange="handleImageUpload(event)">
+                </div>
+                <div class="uploaded-images" id="uploadedImages">
+                    <!-- 上传的图片列表 -->
+                </div>
+            </div>
+        </div>
+
+        <div class="editor-container">
+            <div class="editor-toolbar">
+                <button class="btn split-toggle" id="splitToggle" onclick="toggleSplit()">📱 分屏预览</button>
+                <span style="margin-left: auto; color: #666;">Ctrl+S 保存 | Ctrl+E 导出</span>
+            </div>
+            <div class="editor-content">
+                <div class="editor-pane">
+                    <textarea id="markdownEditor" placeholder="开始编写您的内容...\n\n支持Markdown语法：\n# 标题\n**粗体** *斜体*\n![图片](路径)\n> 引用\n\n快捷键：\nCtrl+S: 保存\nCtrl+E: 导出Hugo格式"></textarea>
+                </div>
+                <div class="preview-pane" id="previewPane" style="display: none;">
+                    <div class="preview-content" id="previewContent">
+                        <p style="color: #999; text-align: center; margin-top: 50px;">实时预览将在这里显示...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <span id="statusText">就绪</span>
+        <span id="wordCount">字数: 0</span>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast" id="toast"></div>
+
+    <!-- 导出模态框 -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📤 导出Hugo文件</h3>
+                <button class="modal-close" onclick="closeModal('exportModal')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="exportPath">导出路径</label>
+                <select id="exportPath">
+                    <option value="content/posts">content/posts (文章)</option>
+                    <option value="content/diary">content/diary (日志)</option>
+                    <option value="content/novel">content/novel (小说)</option>
+                    <option value="content/photos">content/photos (图片)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="fileName">文件名</label>
+                <input type="text" id="fileName" placeholder="自动生成">
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="closeModal('exportModal')">取消</button>
+                <button class="btn btn-success" onclick="confirmExport()">确认导出</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="image-optimizer.js"></script>
+    <script src="image-gallery.js"></script>
+    <script src="image-usage-manager.js"></script>
+    <script src="image-manager.js"></script>
+    <script src="markdown-validator.js"></script>
+    <script src="hugo-integration.js"></script>
+    <script src="editor-enhancements.js"></script>
+    <script src="hugo-editor.js"></script>
+
+</body>
+</html>

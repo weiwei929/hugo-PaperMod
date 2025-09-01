@@ -1,0 +1,18 @@
+{
+  "title": "编辑器测试",
+  "content": "# 编辑器测试\n看看编辑器功能能否正常实现？\n## 测试一：界面打开是否正常\n从目前的情况来看，界面打开已经正常，可以再服务器的编辑器路径下 start\n中间出现过一个小错误，很快就修复了。\n\n## 测试二：各项编辑功能是否正常\n正在这里进行测试，目前基本编辑功能正常。分屏显示的感觉还不错，字体、排版基本正常。\n\n## 测试三：",
+  "frontMatter": {
+    "title": "编辑器测试",
+    "date": "2025-08-30T05:22:23.456Z",
+    "draft": false,
+    "description": "这是编辑器测试文档",
+    "toc": true,
+    "comments": true,
+    "showShareButtons": true,
+    "contentType": "post",
+    "categories": [],
+    "tags": []
+  },
+  "images": [],
+  "timestamp": "2025-08-30T05:22:23.456Z"
+}

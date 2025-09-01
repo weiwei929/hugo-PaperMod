@@ -1,0 +1,400 @@
+/* 图片管理模块样式 */
+.image-preview-container {
+    margin: 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+    overflow: hidden;
+}
+
+.image-preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.image-preview-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+.image-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.image-controls .btn {
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.image-preview-item {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.image-preview-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.image-preview-wrapper {
+    position: relative;
+    height: 150px;
+    overflow: hidden;
+}
+
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.image-preview-item:hover .image-overlay {
+    opacity: 1;
+}
+
+.image-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.image-actions .btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
+}
+
+.image-info {
+    padding: 12px;
+}
+
+.image-name {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.image-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.image-path {
+    font-size: 11px;
+    color: #999;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.image-upload-zone {
+    margin: 20px;
+    padding: 40px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fff;
+}
+
+.image-upload-zone:hover,
+.image-upload-zone.drag-over {
+    border-color: #007bff;
+    background: #f8f9fa;
+}
+
+.upload-zone-content i {
+    font-size: 48px;
+    color: #ccc;
+    margin-bottom: 15px;
+}
+
+.upload-zone-content p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.upload-hint {
+    font-size: 12px;
+    color: #999;
+}
+
+.image-processing-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.processing-content {
+    text-align: center;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .image-preview-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        padding: 15px;
+    }
+    
+    .image-preview-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+    
+    .image-controls {
+        justify-content: center;
+    }
+    
+    .image-upload-zone {
+        padding: 30px 20px;
+    }
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+    .image-preview-container {
+        background: #2d3748;
+        border-color: #4a5568;
+    }
+    
+    .image-preview-header {
+        background: #1a202c;
+        border-color: #4a5568;
+    }
+    
+    .image-preview-header h3 {
+        color: #e2e8f0;
+    }
+    
+    .image-preview-item {
+        background: #1a202c;
+    }
+    
+    .image-name {
+        color: #e2e8f0;
+    }
+    
+    .image-details {
+        color: #a0aec0;
+    }
+    
+    .image-path {
+        color: #718096;
+    }
+    
+    .image-upload-zone {
+        background: #1a202c;
+        border-color: #4a5568;
+    }
+    
+    .image-upload-zone:hover,
+    .image-upload-zone.drag-over {
+        background: #2d3748;
+    }
+}
+
+/* 新增样式 - 添加到现有CSS文件末尾 */
+
+/* 图片压缩信息样式 */
+.image-compression {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.compression-info {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.original-size {
+    color: #999;
+}
+
+/* 统计模态框样式 */
+.stat-item {
+    text-align: center;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+/* 优化建议样式 */
+.optimization-suggestions .alert {
+    margin-bottom: 8px;
+}
+
+.optimization-suggestions .alert:last-child {
+    margin-bottom: 0;
+}
+
+/* 格式选项样式 */
+.format-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.format-options .btn {
+    flex: 1;
+    min-width: 120px;
+}
+
+/* 图片操作按钮增强 */
+.image-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.image-actions .btn {
+    padding: 4px 6px;
+    font-size: 11px;
+    border-radius: 3px;
+    min-width: 28px;
+}
+
+/* 处理进度指示器增强 */
+.image-processing-indicator {
+    position: relative;
+    overflow: hidden;
+}
+
+.image-processing-indicator::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* 响应式增强 */
+@media (max-width: 576px) {
+    .image-actions {
+        gap: 4px;
+    }
+    
+    .image-actions .btn {
+        padding: 3px 5px;
+        font-size: 10px;
+        min-width: 24px;
+    }
+    
+    .format-options .btn {
+        min-width: 100px;
+        font-size: 12px;
+    }
+    
+    .stat-item {
+        padding: 10px;
+    }
+    
+    .stat-value {
+        font-size: 18px;
+    }
+}
+
+/* 暗色主题增强 */
+@media (prefers-color-scheme: dark) {
+    .stat-item {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .stat-value {
+        color: #e2e8f0;
+    }
+    
+    .compression-info {
+        color: #68d391;
+    }
+    
+    .optimization-suggestions .alert {
+        background: #2d3748;
+        border-color: #4a5568;
+        color: #e2e8f0;
+    }
+}

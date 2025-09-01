@@ -1,0 +1,267 @@
+# Hugo Editor 配置文件
+# Hugo Editor Configuration File
+# @version 1.0.0
+
+# 编辑器基本配置
+editor:
+  # 自动保存间隔（秒）
+  auto_save_interval: 30
+  # 默认导出路径
+  default_export_path: "content/posts"
+  # 启用备份
+  backup_enabled: true
+  # 备份间隔（秒）
+  backup_interval: 300
+  # 最大备份数量
+  max_backups: 10
+  # 编辑器主题
+  theme: "default"
+  # 字体大小
+  font_size: 14
+  # 启用语法高亮
+  syntax_highlighting: true
+  # 启用实时预览
+  live_preview: true
+  # 启用字数统计
+  word_count: true
+  # 启用阅读时间估算
+  reading_time: true
+
+# 图片处理配置
+image:
+  # 自动压缩
+  auto_compress: true
+  # JPEG 质量 (1-100)
+  jpeg_quality: 85
+  # PNG 压缩级别 (0-9)
+  png_compression: 6
+  # WebP 质量 (1-100)
+  webp_quality: 85
+  # 最大文件大小 (MB)
+  max_file_size: 10
+  # 最大宽度 (px)
+  max_width: 1920
+  # 最大高度 (px)
+  max_height: 1080
+  # 自动转换为 WebP
+  auto_webp: true
+  # 保留原始文件
+  preserve_original: false
+  # 支持的格式
+  allowed_formats:
+    - "image/jpeg"
+    - "image/png"
+    - "image/gif"
+    - "image/webp"
+  # 图片分类
+  categories:
+    posts: "文章图片"
+    covers: "封面图片"
+    gallery: "图片欣赏"
+    icons: "图标资源"
+
+# 文件服务器配置
+server:
+  # 集成方式: "http_service" 或 "batch_script"
+  integration_method: "http_service"
+  # 服务器端口
+  port: 8081
+  # 服务器主机
+  host: "127.0.0.1"
+  # 请求超时时间（秒）
+  timeout: 10
+  # 重试次数
+  retry_attempts: 3
+  # 启用 CORS
+  enable_cors: true
+  # 允许的来源
+  allowed_origins:
+    - "http://localhost:8080"
+    - "http://127.0.0.1:8080"
+    - "file://"
+
+# 安全配置
+security:
+  # 允许的文件扩展名
+  allowed_extensions:
+    - ".md"
+    - ".txt"
+    - ".json"
+    - ".jpg"
+    - ".jpeg"
+    - ".png"
+    - ".gif"
+    - ".webp"
+  # 最大文件大小 (MB)
+  max_file_size: 10
+  # 启用路径验证
+  path_validation: true
+  # 允许的路径
+  allowed_paths:
+    - "content"
+    - "static/images"
+    - "hugo_editor/exports"
+    - "hugo_editor/temp"
+  # 禁止的路径模式
+  forbidden_patterns:
+    - ".."
+    - "~"
+    - "/etc"
+    - "/var"
+    - "/usr"
+
+# Hugo 项目配置
+hugo:
+  # 项目根目录（相对于编辑器目录）
+  project_root: ".."
+  # 内容目录
+  content_dir: "content"
+  # 静态文件目录
+  static_dir: "static"
+  # 主题目录
+  themes_dir: "themes"
+  # 配置文件名
+  config_files:
+    - "config.yml"
+    - "config.yaml"
+    - "config.toml"
+    - "config.json"
+  # 自动检测项目结构
+  auto_detect: true
+  # 启用 Hugo 命令集成
+  enable_hugo_commands: true
+
+# 模板配置
+templates:
+  # 默认模板
+  default_template: "blog_post"
+  # 模板定义
+  blog_post:
+    name: "博客文章"
+    description: "标准的博客文章模板"
+    front_matter:
+      title: ""
+      date: "{{ now }}"
+      draft: false
+      tags: []
+      categories: []
+      description: ""
+      showToc: true
+      TocOpen: false
+    content: |
+      ## 文章标题
+      
+      在这里开始写作...
+      
+  diary:
+    name: "日记"
+    description: "个人日记模板"
+    front_matter:
+      title: "{{ date }} 日记"
+      date: "{{ now }}"
+      draft: false
+      tags: ["日记"]
+      categories: ["生活"]
+      description: "今天的生活记录"
+    content: |
+      ## 今日记录
+      
+      记录今天发生的事情...
+      
+  project:
+    name: "项目介绍"
+    description: "项目展示模板"
+    front_matter:
+      title: ""
+      date: "{{ now }}"
+      draft: false
+      tags: ["项目"]
+      categories: ["技术"]
+      description: ""
+      showToc: true
+      cover:
+        image: ""
+        alt: ""
+        caption: ""
+    content: |
+      ## 项目概述
+      
+      ### 技术栈
+      
+      ### 功能特性
+      
+      ### 安装使用
+      
+      ### 项目截图
+
+# 快捷键配置
+shortcuts:
+  save: "Ctrl+S"
+  export: "Ctrl+E"
+  preview: "Ctrl+P"
+  bold: "Ctrl+B"
+  italic: "Ctrl+I"
+  link: "Ctrl+K"
+  image: "Ctrl+Shift+I"
+  code: "Ctrl+`"
+  quote: "Ctrl+Shift+>"
+  list: "Ctrl+L"
+  heading: "Ctrl+H"
+
+# 界面配置
+ui:
+  # 默认分屏模式
+  default_split: true
+  # 侧边栏宽度
+  sidebar_width: 300
+  # 编辑器宽度比例
+  editor_width_ratio: 0.5
+  # 预览宽度比例
+  preview_width_ratio: 0.5
+  # 显示行号
+  show_line_numbers: true
+  # 显示状态栏
+  show_status_bar: true
+  # 显示工具栏
+  show_toolbar: true
+  # 紧凑模式
+  compact_mode: false
+
+# 导出配置
+export:
+  # 默认文件名格式
+  filename_format: "{{ date }}-{{ slug }}.md"
+  # 日期格式
+  date_format: "YYYY-MM-DD"
+  # 自动生成 slug
+  auto_slug: true
+  # Slug 分隔符
+  slug_separator: "-"
+  # 包含图片
+  include_images: true
+  # 图片导出路径
+  image_export_path: "static/images"
+
+# 性能配置
+performance:
+  # 启用懒加载
+  lazy_loading: true
+  # 图片缓存大小 (MB)
+  image_cache_size: 100
+  # 文档缓存大小
+  document_cache_size: 50
+  # 自动清理缓存
+  auto_cleanup: true
+  # 清理间隔（小时）
+  cleanup_interval: 24
+
+# 调试配置
+debug:
+  # 启用调试模式
+  enabled: false
+  # 日志级别: "debug", "info", "warn", "error"
+  log_level: "info"
+  # 显示性能指标
+  show_performance: false
+  # 启用详细错误信息
+  verbose_errors: true

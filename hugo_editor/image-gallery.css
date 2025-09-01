@@ -1,0 +1,635 @@
+/**
+ * Image Gallery Styles
+ * 图片库样式文件
+ */
+
+/* 图片库容器 */
+.image-gallery {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 图片库头部 */
+.gallery-header {
+    padding: 16px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.gallery-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.gallery-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* 搜索框 */
+.gallery-search {
+    position: relative;
+    min-width: 200px;
+}
+
+.gallery-search input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.gallery-search input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.gallery-search::before {
+    content: '🔍';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    pointer-events: none;
+}
+
+/* 排序选择器 */
+.gallery-sort {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    outline: none;
+}
+
+/* 视图切换按钮 */
+.view-toggle {
+    display: flex;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.view-toggle button {
+    padding: 8px 12px;
+    border: none;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.view-toggle button.active {
+    background: #007bff;
+    color: white;
+}
+
+.view-toggle button:hover:not(.active) {
+    background: #f8f9fa;
+}
+
+/* 批量操作栏 */
+.batch-actions {
+    padding: 12px 16px;
+    background: #e3f2fd;
+    border-bottom: 1px solid #bbdefb;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.batch-actions.show {
+    display: flex;
+}
+
+.batch-info {
+    font-size: 14px;
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.batch-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.batch-btn {
+    padding: 6px 12px;
+    border: 1px solid #1976d2;
+    background: white;
+    color: #1976d2;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.batch-btn:hover {
+    background: #1976d2;
+    color: white;
+}
+
+.batch-btn.danger {
+    border-color: #d32f2f;
+    color: #d32f2f;
+}
+
+.batch-btn.danger:hover {
+    background: #d32f2f;
+    color: white;
+}
+
+/* 图片网格容器 */
+.gallery-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 16px;
+    min-height: 200px;
+}
+
+/* 列表视图 */
+.images-grid.list-view {
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+/* 图片项 */
+.gallery-image-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8f9fa;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.gallery-image-item:hover {
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-image-item.selected {
+    border-color: #007bff;
+    background: #e3f2fd;
+}
+
+/* 图片缩略图 */
+.gallery-image-thumb {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+}
+
+.list-view .gallery-image-thumb {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+}
+
+/* 图片信息 */
+.gallery-image-info {
+    padding: 8px;
+    background: white;
+}
+
+.list-view .gallery-image-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+}
+
+.gallery-image-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #333;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.list-view .gallery-image-name {
+    margin: 0;
+    flex: 1;
+}
+
+.gallery-image-meta {
+    font-size: 11px;
+    color: #666;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-view .gallery-image-meta {
+    font-size: 12px;
+    gap: 16px;
+}
+
+/* 选择复选框 */
+.gallery-image-checkbox {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid white;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 12px;
+}
+
+.gallery-image-item:hover .gallery-image-checkbox,
+.gallery-image-item.selected .gallery-image-checkbox {
+    display: flex;
+}
+
+.gallery-image-item.selected .gallery-image-checkbox {
+    background: #007bff;
+    border-color: #007bff;
+}
+
+/* 空状态 */
+.gallery-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.gallery-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.gallery-empty-text {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.gallery-empty-hint {
+    font-size: 14px;
+    color: #999;
+}
+
+/* 全屏预览 */
+.gallery-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-fullscreen.show {
+    display: flex;
+}
+
+.fullscreen-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.fullscreen-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+/* 全屏控制按钮 */
+.fullscreen-controls {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 12px;
+}
+
+.fullscreen-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s;
+}
+
+.fullscreen-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+/* 导航按钮 */
+.fullscreen-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: all 0.2s;
+}
+
+.fullscreen-nav:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.fullscreen-nav.prev {
+    left: 20px;
+}
+
+.fullscreen-nav.next {
+    right: 20px;
+}
+
+/* 图片信息面板 */
+.fullscreen-info {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 16px;
+    border-radius: 8px;
+    display: none;
+}
+
+.fullscreen-info.show {
+    display: block;
+}
+
+.fullscreen-info h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+}
+
+.fullscreen-info p {
+    margin: 4px 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .gallery-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .gallery-controls {
+        justify-content: space-between;
+    }
+    
+    .gallery-search {
+        min-width: auto;
+        flex: 1;
+    }
+    
+    .images-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 12px;
+    }
+    
+    .gallery-image-thumb {
+        height: 100px;
+    }
+    
+    .fullscreen-controls {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .fullscreen-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .fullscreen-nav.prev {
+        left: 10px;
+    }
+    
+    .fullscreen-nav.next {
+        right: 10px;
+    }
+    
+    .fullscreen-info {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        padding: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .images-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+    }
+    
+    .gallery-image-thumb {
+        height: 80px;
+    }
+    
+    .batch-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .batch-buttons {
+        justify-content: center;
+    }
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+    .image-gallery {
+        background: #2d2d2d;
+        color: #e0e0e0;
+    }
+    
+    .gallery-header {
+        background: #3d3d3d;
+        border-bottom-color: #555;
+    }
+    
+    .gallery-title {
+        color: #e0e0e0;
+    }
+    
+    .gallery-search input,
+    .gallery-sort {
+        background: #3d3d3d;
+        border-color: #555;
+        color: #e0e0e0;
+    }
+    
+    .gallery-search input:focus {
+        border-color: #4dabf7;
+    }
+    
+    .view-toggle button {
+        background: #3d3d3d;
+        color: #e0e0e0;
+        border-color: #555;
+    }
+    
+    .view-toggle button.active {
+        background: #4dabf7;
+    }
+    
+    .gallery-image-item {
+        background: #3d3d3d;
+    }
+    
+    .gallery-image-item:hover {
+        border-color: #4dabf7;
+    }
+    
+    .gallery-image-item.selected {
+        border-color: #4dabf7;
+        background: #1e3a5f;
+    }
+    
+    .gallery-image-info {
+        background: #3d3d3d;
+    }
+    
+    .gallery-image-name {
+        color: #e0e0e0;
+    }
+    
+    .gallery-image-meta {
+        color: #b0b0b0;
+    }
+    
+    .batch-actions {
+        background: #1e3a5f;
+        border-bottom-color: #4dabf7;
+    }
+    
+    .batch-info {
+        color: #4dabf7;
+    }
+    
+    .batch-btn {
+        background: #3d3d3d;
+        border-color: #4dabf7;
+        color: #4dabf7;
+    }
+    
+    .batch-btn:hover {
+        background: #4dabf7;
+        color: #2d2d2d;
+    }
+}
+
+/* 加载动画 */
+.gallery-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #666;
+}
+
+.gallery-loading::after {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ddd;
+    border-top-color: #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 12px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 拖拽状态 */
+.gallery-drag-over {
+    border: 2px dashed #007bff;
+    background: rgba(0, 123, 255, 0.05);
+}
+
+.gallery-drag-over::after {
+    content: '拖拽图片到此处添加到库中';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 123, 255, 0.9);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    pointer-events: none;
+}

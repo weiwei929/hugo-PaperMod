@@ -1,0 +1,60 @@
+baseURL: "https://yourdomain.com"
+languageCode: "zh-cn"
+title: "飞·博客"
+theme: "PaperMod"
+
+params:
+  env: production
+  title: "飞·博客"
+  description: "这是Pennfly的个人博客"
+  keywords: [博客, 技术, 分享]
+  author: "Pennfly"
+  
+  # 主页模式
+  homeInfoParams:
+    Title: "欢迎来到飞·博客"
+    Content: "分享Pennfly的技术与生活"
+  
+  # 社交图标
+  socialIcons:
+    - name: github
+      url: "https://github.com/weiwei929"
+    - name: email
+      url: "mailto:pennfly2008@gmail.com"
+  
+  # 搜索功能
+  fuseOpts:
+    isCaseSensitive: false
+    shouldSort: true
+    location: 0
+    distance: 1000
+    threshold: 0.4
+    minMatchCharLength: 0
+    keys: ["title", "permalink", "summary", "content"]
+
+# 菜单配置
+menu:
+  main:
+    - identifier: home
+      name: 首页
+      url: /
+      weight: 10
+    - identifier: posts
+      name: 文章
+      url: /posts/
+      weight: 20
+    - identifier: archives
+      name: 归档
+      url: /archives/
+      weight: 30
+    - identifier: search
+      name: 搜索
+      url: /search/
+      weight: 40
+
+# 输出格式
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON # 搜索功能需要
