@@ -1,0 +1,49 @@
+[Unit]
+Description=Hugo Editor Service
+Documentation=https://github.com/your-username/hugo-PaperMod
+After=network.target
+Wants=network.target
+
+[Service]
+Type=forking
+User=hugo-editor
+Group=hugo-editor
+WorkingDirectory=/opt/hugo-editor/hugo_editor
+
+# 环境变量
+Environment=NODE_ENV=production
+Environment=PORT=8080
+Environment=FILE_SERVER_PORT=8081
+Environment=HUGO_ENV=production
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+
+# 启动命令
+ExecStart=/opt/hugo-editor/hugo_editor/start-services.sh
+ExecStop=/opt/hugo-editor/hugo_editor/stop-services.sh
+ExecReload=/bin/kill -HUP $MAINPID
+
+# 进程管理
+PIDFile=/opt/hugo-editor/logs/hugo-editor.pid
+Restart=always
+RestartSec=10
+StartLimitInterval=60s
+StartLimitBurst=3
+
+# 安全设置
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/hugo-editor
+
+# 资源限制
+LimitNOFILE=65536
+LimitNPROC=4096
+
+# 日志
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=hugo-editor
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,47 @@
+[Unit]
+Description=Hugo Editor UI Server
+Documentation=https://github.com/your-username/hugo-PaperMod
+After=network.target hugo-file-server.service
+Wants=network.target
+Requires=hugo-file-server.service
+
+[Service]
+Type=simple
+User=hugo-editor
+Group=hugo-editor
+WorkingDirectory=/opt/hugo-editor/hugo_editor
+
+# 环境变量
+Environment=NODE_ENV=production
+Environment=PORT=8080
+Environment=FILE_SERVER_URL=http://127.0.0.1:8081
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+
+# 启动命令
+ExecStart=/usr/bin/node editor-server.js
+ExecReload=/bin/kill -HUP $MAINPID
+
+# 进程管理
+Restart=always
+RestartSec=5
+StartLimitInterval=60s
+StartLimitBurst=3
+
+# 安全设置
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/hugo-editor
+
+# 资源限制
+LimitNOFILE=65536
+LimitNPROC=1024
+
+# 日志
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=hugo-editor-ui
+
+[Install]
+WantedBy=multi-user.target
