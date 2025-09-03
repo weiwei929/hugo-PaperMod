@@ -16,8 +16,11 @@ const PORT = 8080;
 const editorPath = path.resolve(__dirname);
 const projectRoot = path.resolve(__dirname, '..');
 
-// 静态文件服务
+// 静态文件服务（编辑器）
 app.use(express.static(editorPath));
+
+// Hugo 主站静态服务（public 目录）
+app.use('/site', express.static(path.join(projectRoot, 'public')));
 
 // 日志中间件
 app.use((req, res, next) => {
@@ -30,9 +33,9 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', service: 'Hugo Editor Unified Server', timestamp: new Date().toISOString() });
 });
 
-// 主页重定向到编辑器
+// 主页重定向到 Hugo 主站首页
 app.get('/', (req, res) => {
-    res.redirect('/hugo-editor.html');
+    res.sendFile(path.join(projectRoot, 'public', 'index.html'));
 });
 
 // CORS 配置（API 路由专用）
