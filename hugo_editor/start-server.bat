@@ -81,26 +81,11 @@ if not exist "static\images" (
 
 cd hugo_editor
 
-echo [信息] 正在启动 Hugo Editor 服务...
-echo [信息] 文件服务器: http://127.0.0.1:8081
-echo [信息] 编辑器界面: http://127.0.0.1:8080
+echo [信息] 正在启动 Hugo Editor 统一服务器...
+echo [信息] 服务地址: http://127.0.0.1:8080
 echo [信息] 按 Ctrl+C 停止服务器
 echo.
-
-REM 启动文件服务器（后台）
-echo [信息] 启动文件服务器...
-start /B node file-server.js
-
-REM 等待文件服务器启动
-timeout /t 3 /nobreak >nul
-
-REM 启动编辑器界面服务器
-echo [信息] 启动编辑器界面服务器...
-echo [信息] 请在浏览器中访问: http://127.0.0.1:8080
-echo.
-node editor-server.js
-
-REM 如果服务器意外退出
+node unified-server.js
 echo.
 echo [信息] 服务器已停止
 pause

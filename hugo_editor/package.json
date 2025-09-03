@@ -2,10 +2,10 @@
   "name": "hugo-editor-server",
   "version": "1.0.0",
   "description": "Hugo Editor 本地文件服务器",
-  "main": "file-server.js",
+  "main": "unified-server.js",
   "scripts": {
-    "start": "node file-server.js",
-    "dev": "nodemon file-server.js",
+    "start": "node unified-server.js",
+    "dev": "nodemon unified-server.js",
     "test": "jest",
     "install-deps": "npm install"
   },
