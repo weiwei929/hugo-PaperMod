@@ -1374,7 +1374,7 @@ class ImageManager {
 
         // 准备上传数据
         const formData = new FormData();
-        formData.append('images', imageInfo.originalFile);
+        formData.append('image', imageInfo.originalFile); // 修正字段名为 'image'
         formData.append('category', 'posts'); // 默认分类
 
         // 如果有文章标题，添加为 articleSlug
