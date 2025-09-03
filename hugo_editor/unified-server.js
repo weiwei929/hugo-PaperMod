@@ -1,3 +1,5 @@
+// 其他 API 路由可按需扩展...
+
 // 兜底 Hugo 站点静态资源（如 /posts/xxx/、/tags/xxx/ 等）
 app.use(async (req, res, next) => {
     try {
