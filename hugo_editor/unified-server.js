@@ -1,18 +1,3 @@
-// 其他 API 路由可按需扩展...
-
-// 兜底 Hugo 站点静态资源（如 /posts/xxx/、/tags/xxx/ 等）
-app.use(async (req, res, next) => {
-    try {
-        const filePath = path.join(projectRoot, 'public', req.path);
-        const stat = await fs.stat(filePath);
-        if (stat.isFile()) {
-            return res.sendFile(filePath);
-        }
-    } catch {
-        // 文件不存在则继续后续处理
-    }
-    next();
-});
 /**
  * Hugo Editor 统一服务器（单进程单端口）
  * 集成静态服务和 API 服务，端口默认 8080
