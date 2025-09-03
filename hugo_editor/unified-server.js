@@ -92,11 +92,14 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 // API 路由：文件写入
 app.post('/api/save', async (req, res) => {
     try {
-        const { filename, content } = req.body;
+        const { filename, content, directory } = req.body;
         if (!filename || !content) return res.status(400).json({ error: 'Missing filename or content' });
-        const filePath = path.join(projectRoot, 'content', 'posts', filename);
+        // 支持自定义导出目录
+        let targetDir = path.join(projectRoot, directory || 'content/posts');
+        await fs.mkdir(targetDir, { recursive: true });
+        const filePath = path.join(targetDir, filename);
         await fs.writeFile(filePath, content, 'utf8');
-        res.json({ success: true, filename });
+        res.json({ success: true, filename, relativePath: path.relative(projectRoot, filePath) });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

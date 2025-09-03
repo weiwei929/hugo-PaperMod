@@ -722,21 +722,14 @@ class HugoEditor {
 
     async exportViaFileServer(fileName, exportPath) {
         this.setStatus('正在导出到 Hugo 项目...');
-
         try {
-            // 检查文件服务器状态
-            const healthResponse = await fetch('http://127.0.0.1:8081/health');
-            if (!healthResponse.ok) {
-                throw new Error('文件服务器不可用');
-            }
-
             // 收集文章数据
             const frontMatter = this.collectFrontMatter();
             const content = document.getElementById('markdownEditor').value;
             const hugoContent = this.generateHugoMarkdown(frontMatter, content);
 
-            // 发送文件写入请求
-            const response = await fetch('http://127.0.0.1:8081/api/files/write', {
+            // 发送文件写入请求到统一服务器（8080）
+            const response = await fetch('/api/save', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -751,16 +744,14 @@ class HugoEditor {
             const result = await response.json();
 
             if (result.success) {
-                this.showToast(`文章已成功导出到: ${result.relativePath}`, 'success');
+                this.showToast(`文章已成功导出到: ${fileName}`, 'success');
                 this.setStatus('导出成功');
-
-                // 可选：触发 Hugo 重新构建
                 await this.triggerHugoRebuild();
             } else {
                 throw new Error(result.error || '导出失败');
             }
         } catch (error) {
-            console.error('文件服务器导出失败:', error);
+            console.error('统一服务器导出失败:', error);
             this.setStatus('导出失败');
             throw error;
         }
