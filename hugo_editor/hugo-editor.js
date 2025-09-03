@@ -18,12 +18,83 @@ class HugoEditor {
         this.setupAutoSave();
         this.loadFromLocalStorage();
         this.updatePreview();
+        this.setupMemoryManagement();
+    }
+    
+    setupMemoryManagement() {
+        // 性能监控
+        this.performanceMetrics = {
+            lastRenderTime: 0,
+            renderCount: 0,
+            memoryCheckInterval: null
+        };
+        
+        // 定期清理内存
+        this.performanceMetrics.memoryCheckInterval = setInterval(() => {
+            this.cleanupMemory();
+            this.checkPerformance();
+        }, 30000); // 每30秒检查一次
+        
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', () => {
+            this.cleanup();
+        });
+    }
+    
+    cleanupMemory() {
+        // 清理可能的内存泄漏
+        const textarea = document.getElementById('markdownEditor');
+        if (textarea && textarea.value.length > 100000) {
+            console.log('执行内存清理，文档大小:', (textarea.value.length / 1024).toFixed(2) + 'KB');
+            
+            // 强制垃圾回收提示（如果浏览器支持）
+            if (window.gc) {
+                window.gc();
+            }
+        }
+    }
+    
+    checkPerformance() {
+        const textarea = document.getElementById('markdownEditor');
+        if (!textarea) return;
+        
+        const metrics = {
+            documentSize: textarea.value.length,
+            lineCount: textarea.value.split('\n').length,
+            renderCount: this.performanceMetrics.renderCount,
+            lastRenderTime: this.performanceMetrics.lastRenderTime
+        };
+        
+        // 如果性能指标异常，给出建议
+        if (metrics.documentSize > 200000) {
+            console.warn('性能警告：文档过大 (>200KB)，建议分割文档');
+        }
+        
+        if (metrics.lastRenderTime > 1000) {
+            console.warn('性能警告：渲染时间过长 (>1s)，考虑减少预览更新频率');
+        }
+        
+        // 重置计数器
+        this.performanceMetrics.renderCount = 0;
+    }
+    
+    cleanup() {
+        // 清理定时器
+        if (this.autoSaveInterval) {
+            clearInterval(this.autoSaveInterval);
+        }
+        if (this.performanceMetrics && this.performanceMetrics.memoryCheckInterval) {
+            clearInterval(this.performanceMetrics.memoryCheckInterval);
+        }
+        
+        console.log('编辑器清理完成');
     }
 
     setupEventListeners() {
         // 编辑器内容变化 - 添加防抖优化
         const editor = document.getElementById('markdownEditor');
         let previewUpdateTimeout;
+        let lastPreviewContent = '';
         
         editor.addEventListener('input', () => {
             // 立即更新字数统计（轻量操作）
@@ -34,9 +105,19 @@ class HugoEditor {
             if (previewUpdateTimeout) {
                 clearTimeout(previewUpdateTimeout);
             }
+            
+            // 对于大文档，增加防抖延迟
+            const content = editor.value;
+            const debounceDelay = content.length > 50000 ? 1000 : 
+                                 content.length > 20000 ? 600 : 300;
+            
             previewUpdateTimeout = setTimeout(() => {
-                this.updatePreview();
-            }, 300); // 300ms 防抖延迟
+                // 只有内容真正改变时才更新预览
+                if (content !== lastPreviewContent) {
+                    this.updatePreview();
+                    lastPreviewContent = content;
+                }
+            }, debounceDelay);
         });
 
         // 标题变化
@@ -215,20 +296,94 @@ class HugoEditor {
         const previewContent = document.getElementById('previewContent');
         
         if (content.trim()) {
-            // 对于大文档，限制预览长度以提高性能
+            // 基于文档大小的智能预览策略
             let previewText = content;
-            if (content.length > 10000) {
-                // 只预览前10000个字符
-                previewText = content.substring(0, 10000) + '\n\n... (文档过长，仅显示前10000字符预览)';
-                console.log('大文档检测，限制预览长度以提高性能');
+            let limitMessage = '';
+            
+            if (content.length > 100000) {
+                // 超大文档：只预览前5000字符
+                previewText = content.substring(0, 5000);
+                limitMessage = '\n\n**⚠️ 文档过大，仅显示前5000字符预览。建议分割文档以提高性能。**';
+                console.log('超大文档检测，极限预览模式');
+            } else if (content.length > 50000) {
+                // 大文档：只预览前15000字符
+                previewText = content.substring(0, 15000);
+                limitMessage = '\n\n**📝 大文档检测，仅显示前15000字符预览。**';
+                console.log('大文档检测，限制预览长度');
+            } else if (content.length > 20000) {
+                // 中等文档：预览前30000字符
+                previewText = content.substring(0, 30000);
+                limitMessage = '\n\n**📄 中等文档，显示前30000字符预览。**';
             }
             
-            // 简单的Markdown渲染（可以集成更完整的Markdown解析器）
-            let html = this.simpleMarkdownRender(previewText);
-            previewContent.innerHTML = html;
+            // 使用分片渲染避免阻塞UI
+            this.renderPreviewInChunks(previewText + limitMessage, previewContent);
         } else {
             previewContent.innerHTML = '<p style="color: #999; text-align: center; margin-top: 50px;">实时预览将在这里显示...</p>';
         }
+    }
+    
+    renderPreviewInChunks(text, container) {
+        const startTime = performance.now();
+        
+        // 对于较小的文本，直接渲染
+        if (text.length < 10000) {
+            const html = this.simpleMarkdownRender(text);
+            container.innerHTML = html;
+            
+            // 记录性能
+            const renderTime = performance.now() - startTime;
+            if (this.performanceMetrics) {
+                this.performanceMetrics.lastRenderTime = renderTime;
+                this.performanceMetrics.renderCount++;
+            }
+            return;
+        }
+        
+        // 大文本分片渲染
+        console.log('使用分片渲染，文本长度:', text.length);
+        
+        // 清空容器
+        container.innerHTML = '<div style="color: #666; text-align: center; padding: 20px;">正在渲染预览...</div>';
+        
+        // 分批渲染
+        const chunkSize = 5000;
+        const chunks = [];
+        for (let i = 0; i < text.length; i += chunkSize) {
+            chunks.push(text.substring(i, i + chunkSize));
+        }
+        
+        let renderedHtml = '';
+        let chunkIndex = 0;
+        
+        const renderNextChunk = () => {
+            if (chunkIndex < chunks.length) {
+                const chunkHtml = this.simpleMarkdownRender(chunks[chunkIndex]);
+                renderedHtml += chunkHtml;
+                chunkIndex++;
+                
+                // 更新进度
+                const progress = Math.round((chunkIndex / chunks.length) * 100);
+                if (chunkIndex === chunks.length) {
+                    container.innerHTML = renderedHtml;
+                    
+                    // 记录性能
+                    const renderTime = performance.now() - startTime;
+                    if (this.performanceMetrics) {
+                        this.performanceMetrics.lastRenderTime = renderTime;
+                        this.performanceMetrics.renderCount++;
+                    }
+                    console.log('分片渲染完成，耗时:', renderTime.toFixed(2) + 'ms');
+                } else {
+                    container.innerHTML = renderedHtml + `<div style="color: #666; text-align: center; padding: 10px;">渲染进度: ${progress}%</div>`;
+                    // 使用 requestAnimationFrame 避免阻塞
+                    requestAnimationFrame(renderNextChunk);
+                }
+            }
+        };
+        
+        // 开始渲染
+        setTimeout(renderNextChunk, 0);
     }
 
     simpleMarkdownRender(text) {

@@ -212,7 +212,12 @@
             background: white;
             border-left: 1px solid #ddd;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 20px;
+            /* 确保预览面板可以滚动 */
+            height: 100%;
+            max-height: 100%;
+            box-sizing: border-box;
         }
 
         .preview-content {
