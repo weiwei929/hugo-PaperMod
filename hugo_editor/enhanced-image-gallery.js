@@ -14,7 +14,7 @@ class EnhancedImageGallery {
             allowMultiSelect: options.allowMultiSelect !== false,
             showUpload: options.showUpload !== false,
             categories: options.categories || ['all', 'posts', 'covers', 'gallery', 'icons'],
-            serverUrl: options.serverUrl || 'http://127.0.0.1:8080',
+            serverUrl: options.serverUrl || window.location.origin,
             maxFileSize: options.maxFileSize || 10 * 1024 * 1024, // 10MB
             allowedTypes: options.allowedTypes || ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
             ...options
@@ -319,7 +319,7 @@ class EnhancedImageGallery {
             files.forEach(file => formData.append('images', file));
             formData.append('category', this.currentCategory === 'all' ? 'posts' : this.currentCategory);
             
-            const response = await fetch(`${this.options.serverUrl}/api/images/upload`, {
+            const response = await fetch(`${this.options.serverUrl}/api/upload`, {
                 method: 'POST',
                 body: formData
             });

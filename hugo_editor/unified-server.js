@@ -12,9 +12,38 @@ const sharp = require('sharp');
 const { v4: uuidv4 } = require('uuid');
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const editorPath = path.resolve(__dirname);
 const projectRoot = path.resolve(__dirname, '..');
+
+// 环境检测
+console.log('🔧 环境信息:');
+console.log(`   - Node.js: ${process.version}`);
+console.log(`   - 平台: ${process.platform}`);
+console.log(`   - 架构: ${process.arch}`);
+console.log(`   - 工作目录: ${projectRoot}`);
+console.log(`   - 编辑器目录: ${editorPath}`);
+console.log(`   - 端口: ${PORT}`);
+
+// 检查必要的目录
+async function ensureDirectories() {
+    const dirs = [
+        path.join(projectRoot, 'static', 'images', 'uploads'),
+        path.join(projectRoot, 'content', 'posts'),
+        path.join(projectRoot, 'public')
+    ];
+    
+    for (const dir of dirs) {
+        try {
+            await fs.mkdir(dir, { recursive: true });
+            console.log(`✅ 目录确认: ${path.relative(projectRoot, dir)}`);
+        } catch (err) {
+            console.warn(`⚠️  目录创建失败: ${path.relative(projectRoot, dir)} - ${err.message}`);
+        }
+    }
+}
+
+ensureDirectories();
 
 // Hugo 主站静态资源优先处理（public 目录）
 app.use(express.static(path.join(projectRoot, 'public')));
@@ -24,6 +53,9 @@ app.use(express.static(editorPath));
 
 // 图片上传目录静态服务
 app.use('/images/uploads', express.static(path.join(projectRoot, 'static', 'images', 'uploads')));
+
+// Hugo static 目录静态服务（兼容旧的图片路径）
+app.use('/images', express.static(path.join(projectRoot, 'static', 'images')));
 
 // 日志中间件
 app.use((req, res, next) => {
@@ -42,6 +74,7 @@ const allowedOrigins = [
     'http://localhost:8080',
     'http://127.0.0.1:8080',
     'http://43.133.39.84:8080',  // VPS 地址
+    'http://0.0.0.0:8080',      // 通配符监听
     // 可按需扩展其他允许的来源
 ];
 app.use(cors({
@@ -118,11 +151,49 @@ app.post('/api/save', async (req, res) => {
     try {
         const { filename, content, directory } = req.body;
         if (!filename || !content) return res.status(400).json({ error: 'Missing filename or content' });
+        
         // 支持自定义导出目录
         let targetDir = path.join(projectRoot, directory || 'content/posts');
         await fs.mkdir(targetDir, { recursive: true });
         const filePath = path.join(targetDir, filename);
         await fs.writeFile(filePath, content, 'utf8');
+        
+        // 触发 Hugo 重建
+        try {
+            const { spawn } = require('child_process');
+            
+            // 检测操作系统，Windows下使用hugo.exe
+            const isWindows = process.platform === 'win32';
+            const hugoCmd = isWindows ? 'hugo.exe' : 'hugo';
+            
+            const hugo = spawn(hugoCmd, ['--cleanDestinationDir', '--environment', 'production'], { 
+                cwd: projectRoot,
+                stdio: 'pipe',
+                shell: isWindows // Windows需要shell
+            });
+            
+            hugo.stdout.on('data', (data) => {
+                console.log(`Hugo: ${data.toString().trim()}`);
+            });
+            
+            hugo.stderr.on('data', (data) => {
+                console.error(`Hugo错误: ${data.toString().trim()}`);
+            });
+            
+            hugo.on('close', (code) => {
+                console.log(`Hugo 重建完成，退出码: ${code}`);
+                if (code !== 0) {
+                    console.error('Hugo 重建失败');
+                }
+            });
+            
+            hugo.on('error', (err) => {
+                console.error('Hugo 重建错误:', err.message);
+            });
+        } catch (hugoError) {
+            console.warn('Hugo 重建失败:', hugoError.message);
+        }
+        
         res.json({ success: true, filename, relativePath: path.relative(projectRoot, filePath) });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -144,14 +215,67 @@ app.use(async (req, res, next) => {
     next();
 });
 
-// 错误处理
+// 错误处理中间件
 app.use((err, req, res, next) => {
-    console.error('统一服务器错误:', err);
-    res.status(500).json({ error: err.message });
+    console.error(`[${new Date().toISOString()}] 服务器错误:`, {
+        message: err.message,
+        stack: err.stack,
+        url: req.url,
+        method: req.method,
+        ip: req.ip
+    });
+    
+    res.status(500).json({ 
+        error: err.message,
+        timestamp: new Date().toISOString(),
+        path: req.path
+    });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Hugo Editor 统一服务器已启动，端口: ${PORT}`);
-    console.log(`📍 编辑器地址: http://127.0.0.1:${PORT}`);
-    console.log(`📁 服务目录: ${editorPath}`);
+// 404 处理
+app.use((req, res) => {
+    console.warn(`[${new Date().toISOString()}] 404: ${req.method} ${req.path}`);
+    res.status(404).json({ 
+        error: 'Resource not found',
+        path: req.path,
+        method: req.method,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// 启动服务器
+const server = app.listen(PORT, '0.0.0.0', () => {
+    console.log('');
+    console.log('🎉 ===================================');
+    console.log('   Hugo Editor 统一服务器启动成功');
+    console.log('🎉 ===================================');
+    console.log(`🚀 服务器端口: ${PORT}`);
+    console.log(`📍 本地访问: http://127.0.0.1:${PORT}`);
+    console.log(`🌐 外部访问: http://0.0.0.0:${PORT}`);
+    console.log(`📁 项目根目录: ${projectRoot}`);
+    console.log(`📝 编辑器地址: http://127.0.0.1:${PORT}/hugo-editor.html`);
+    console.log(`🏠 主站地址: http://127.0.0.1:${PORT}/`);
+    console.log('');
+    console.log('📚 可用的API端点:');
+    console.log('   - GET  /health          健康检查');
+    console.log('   - POST /api/upload      图片上传');
+    console.log('   - POST /api/save        文章保存');
+    console.log('');
+});
+
+// 优雅关闭
+process.on('SIGTERM', () => {
+    console.log('🛑 收到SIGTERM信号，优雅关闭服务器...');
+    server.close(() => {
+        console.log('✅ 服务器已关闭');
+        process.exit(0);
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('\n🛑 收到SIGINT信号，优雅关闭服务器...');
+    server.close(() => {
+        console.log('✅ 服务器已关闭');
+        process.exit(0);
+    });
 });

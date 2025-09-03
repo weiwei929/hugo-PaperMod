@@ -16,7 +16,7 @@ class EditorEnhancements {
             enableScrollSync: true,
             enableTemplates: true,
             enableFileServer: true,
-            serverUrl: 'http://127.0.0.1:8080',
+            serverUrl: window.location.origin,
             ...options
         };
 

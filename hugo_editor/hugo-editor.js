@@ -435,7 +435,7 @@ class HugoEditor {
 
         container.innerHTML = this.currentDocument.images.map(img => {
             const imageSource = img.uploadedToServer ?
-                `http://127.0.0.1:8080${img.webPath}` :
+                window.location.origin + img.webPath :
                 img.data;
 
             const statusBadge = img.uploadedToServer ?
