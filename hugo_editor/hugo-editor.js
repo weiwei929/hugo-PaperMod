@@ -472,12 +472,13 @@ class HugoEditor {
                 markdownImage = `${image.markdownRef}\n\n`;
             } else if (image.uploadedToServer && image.webPath) {
                 // 使用服务器路径
-                const altText = image.name.replace(/\.[^/.]+$/, ""); // 移除扩展名
+                const altText = image.name ? image.name.replace(/\.[^/.]+$/, "") : "image"; // 移除扩展名
                 markdownImage = `![${altText}](${image.webPath})\n\n`;
             } else {
                 // 本地模式，生成传统路径
                 const imagePath = `/images/${this.generateImageFileName(image)}`;
-                markdownImage = `![${image.name}](${imagePath})\n\n`;
+                const altText = image.name || "image";
+                markdownImage = `![${altText}](${imagePath})\n\n`;
             }
 
             const cursorPos = editor.selectionStart;
@@ -505,7 +506,16 @@ class HugoEditor {
         const date = new Date();
         const dateStr = date.toISOString().split('T')[0];
         const timeStr = date.toTimeString().split(' ')[0].replace(/:/g, '-');
-        const ext = image.name.split('.').pop();
+        
+        // 安全处理文件扩展名
+        let ext = 'jpg'; // 默认扩展名
+        if (image && image.name && typeof image.name === 'string') {
+            const nameParts = image.name.split('.');
+            if (nameParts.length > 1) {
+                ext = nameParts.pop();
+            }
+        }
+        
         return `${dateStr}-${timeStr}-${Math.random().toString(36).substr(2, 5)}.${ext}`;
     }
 
