@@ -551,8 +551,8 @@ class ImageManager {
         // 清理文件名
         const cleanFileName = this.sanitizeFileName(file.name);
         
-        // 生成路径：/images/posts/YYYY/MM/DD/filename
-        return `/images/posts/${year}/${month}/${day}/${cleanFileName}`;
+        // 生成路径：/images/uploads/filename（与服务器存储路径一致）
+        return `/images/uploads/${cleanFileName}`;
     }
     
     /**
@@ -1198,8 +1198,19 @@ class ImageManager {
             uploadTime: imageInfo.uploadTime
         }));
 
-        this.imageGallery.updateImages(galleryImages);
-        this.imageGallery.show();
+        // 检查 updateImages 方法是否存在
+        if (typeof this.imageGallery.updateImages === 'function') {
+            this.imageGallery.updateImages(galleryImages);
+        } else {
+            console.warn('imageGallery.updateImages 方法不存在');
+        }
+        
+        // 检查 show 方法是否存在
+        if (typeof this.imageGallery.show === 'function') {
+            this.imageGallery.show();
+        } else {
+            console.warn('imageGallery.show 方法不存在');
+        }
     }
     
     /**
@@ -1352,7 +1363,8 @@ class ImageManager {
 
         // 检查服务器是否可用
         try {
-            const healthResponse = await fetch('http://127.0.0.1:8080/health');
+            const baseUrl = window.location.origin; // 使用当前页面的源地址
+            const healthResponse = await fetch(`${baseUrl}/health`);
             if (!healthResponse.ok) {
                 throw new Error('文件服务器不可用');
             }
@@ -1373,7 +1385,8 @@ class ImageManager {
         }
 
         // 上传到服务器
-        const response = await fetch('http://127.0.0.1:8080/api/upload', {
+        const baseUrl = window.location.origin; // 使用当前页面的源地址
+        const response = await fetch(`${baseUrl}/api/upload`, {
             method: 'POST',
             body: formData
         });
