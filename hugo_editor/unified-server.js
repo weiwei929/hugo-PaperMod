@@ -99,7 +99,13 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
             filename: optimizedFilename, 
             url: webPath,
             webPath: webPath,
-            markdownRef: `![${file.originalname}](${webPath})`
+            markdownRef: `![${file.originalname}](${webPath})`,
+            // 兼容前端期望的数据结构
+            images: [{
+                filename: optimizedFilename,
+                webPath: webPath,
+                originalname: file.originalname
+            }]
         });
     } catch (err) {
         console.error('图片上传错误:', err);

@@ -543,16 +543,17 @@ class ImageManager {
      * 生成图片路径
      */
     generateImagePath(file) {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        
-        // 清理文件名
+        // 清理文件名，移除特殊字符
         const cleanFileName = this.sanitizeFileName(file.name);
         
+        // 本地模式也使用优化文件名格式，保持与服务器一致
+        const timestamp = Date.now().toString(36);
+        const randomId = Math.random().toString(36).substr(2, 5);
+        const ext = cleanFileName.split('.').pop() || 'jpg';
+        const optimizedName = `optimized-${timestamp}-${randomId}.${ext}`;
+        
         // 生成路径：/images/uploads/filename（与服务器存储路径一致）
-        return `/images/uploads/${cleanFileName}`;
+        return `/images/uploads/${optimizedName}`;
     }
     
     /**
