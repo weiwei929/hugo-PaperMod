@@ -22,6 +22,9 @@ app.use(express.static(path.join(projectRoot, 'public')));
 // 编辑器静态资源（hugo_editor 目录）
 app.use(express.static(editorPath));
 
+// 图片上传目录静态服务
+app.use('/images/uploads', express.static(path.join(projectRoot, 'static', 'images', 'uploads')));
+
 // 日志中间件
 app.use((req, res, next) => {
     console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
@@ -86,6 +89,9 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
             .jpeg({ quality: 85 })
             .toFile(outputPath);
         
+        // 删除原始文件，只保留优化后的文件
+        await fs.unlink(file.path);
+        
         // 返回正确的图片访问路径
         const webPath = `/images/uploads/${optimizedFilename}`;
         res.json({ 
@@ -96,6 +102,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
             markdownRef: `![${file.originalname}](${webPath})`
         });
     } catch (err) {
+        console.error('图片上传错误:', err);
         res.status(500).json({ error: err.message });
     }
 });
