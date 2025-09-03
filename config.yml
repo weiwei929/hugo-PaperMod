@@ -1,4 +1,4 @@
-baseURL: "https://yourdomain.com"
+baseURL: "http://43.133.39.84:8080"
 languageCode: "zh-cn"
 title: "飞·博客"
 theme: "PaperMod"
