@@ -38,6 +38,7 @@ app.get('/health', (req, res) => {
 const allowedOrigins = [
     'http://localhost:8080',
     'http://127.0.0.1:8080',
+    'http://43.133.39.84:8080',  // VPS 地址
     // 可按需扩展其他允许的来源
 ];
 app.use(cors({
