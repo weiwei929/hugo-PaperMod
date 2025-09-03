@@ -48,25 +48,20 @@ app.get('/health', (req, res) => {
     res.json({ status: 'ok', service: 'Hugo Editor Unified Server', timestamp: new Date().toISOString() });
 });
 
-// 主页重定向到 Hugo 主站首页
-app.get('/', (req, res) => {
-    res.sendFile(path.join(projectRoot, 'public', 'index.html'));
-});
 
-// CORS 配置（API 路由专用）
-app.use('/api', cors({
-    origin: function(origin, callback) {
-        if (!origin) return callback(null, true);
-        const allowedOrigins = [
-            'http://localhost:8080',
-            'http://127.0.0.1:8080',
-            'http://localhost:1313',
-            'http://127.0.0.1:1313'
-        ];
-        if (allowedOrigins.includes(origin) || origin.startsWith('file://')) {
-            return callback(null, true);
+// CORS 配置修正
+const allowedOrigins = [
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
+    // 可按需扩展其他允许的来源
+];
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin) || origin.startsWith('file://')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
         }
-        return callback(null, true);
     },
     credentials: false,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
