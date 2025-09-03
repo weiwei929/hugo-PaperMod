@@ -199,6 +199,12 @@
             line-height: 1.6;
             resize: none;
             outline: none;
+            overflow-y: auto;
+            overflow-x: auto;
+            /* 确保滚动性能 */
+            scroll-behavior: smooth;
+            /* 防止滚动卡顿 */
+            will-change: scroll-position;
         }
 
         .preview-pane {
@@ -553,6 +559,7 @@
     <script src="markdown-validator.js"></script>
     <script src="hugo-integration.js"></script>
     <script src="editor-enhancements.js"></script>
+    <script src="scroll-fix.js"></script>
     <script src="hugo-editor.js"></script>
 
 </body>

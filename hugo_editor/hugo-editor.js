@@ -21,12 +21,22 @@ class HugoEditor {
     }
 
     setupEventListeners() {
-        // 编辑器内容变化
+        // 编辑器内容变化 - 添加防抖优化
         const editor = document.getElementById('markdownEditor');
+        let previewUpdateTimeout;
+        
         editor.addEventListener('input', () => {
-            this.updatePreview();
+            // 立即更新字数统计（轻量操作）
             this.updateWordCount();
             this.setStatus('编辑中...');
+            
+            // 防抖更新预览（重量操作）
+            if (previewUpdateTimeout) {
+                clearTimeout(previewUpdateTimeout);
+            }
+            previewUpdateTimeout = setTimeout(() => {
+                this.updatePreview();
+            }, 300); // 300ms 防抖延迟
         });
 
         // 标题变化
@@ -205,8 +215,16 @@ class HugoEditor {
         const previewContent = document.getElementById('previewContent');
         
         if (content.trim()) {
+            // 对于大文档，限制预览长度以提高性能
+            let previewText = content;
+            if (content.length > 10000) {
+                // 只预览前10000个字符
+                previewText = content.substring(0, 10000) + '\n\n... (文档过长，仅显示前10000字符预览)';
+                console.log('大文档检测，限制预览长度以提高性能');
+            }
+            
             // 简单的Markdown渲染（可以集成更完整的Markdown解析器）
-            let html = this.simpleMarkdownRender(content);
+            let html = this.simpleMarkdownRender(previewText);
             previewContent.innerHTML = html;
         } else {
             previewContent.innerHTML = '<p style="color: #999; text-align: center; margin-top: 50px;">实时预览将在这里显示...</p>';
