@@ -366,32 +366,16 @@ class HugoEditor {
     }
 
     async uploadImagesToServer(files) {
-        // 检查文件服务器状态
-        const healthResponse = await fetch('http://127.0.0.1:8081/health');
-        if (!healthResponse.ok) {
-            throw new Error('文件服务器不可用');
-        }
-
         // 准备FormData
         const formData = new FormData();
         files.forEach(file => {
             if (file.type.startsWith('image/')) {
-                formData.append('images', file);
+                formData.append('image', file);
             }
         });
 
-        // 添加分类信息
-        const contentType = document.getElementById('contentType').value;
-        const title = document.getElementById('title').value;
-        const articleSlug = title ? this.generateSlug(title) : null;
-
-        formData.append('category', contentType === 'photo' ? 'gallery' : 'posts');
-        if (articleSlug) {
-            formData.append('articleSlug', articleSlug);
-        }
-
-        // 上传图片
-        const response = await fetch('http://127.0.0.1:8081/api/images/upload', {
+        // 上传图片（单进程合并，8080端口）
+        const response = await fetch('/api/upload', {
             method: 'POST',
             body: formData
         });
@@ -402,7 +386,8 @@ class HugoEditor {
             throw new Error(result.error || '图片上传失败');
         }
 
-        return result.images;
+        // 返回图片信息（如 url）
+        return [{ url: result.url, filename: result.filename }];
     }
 
     async handleImageUploadLocal(files) {
