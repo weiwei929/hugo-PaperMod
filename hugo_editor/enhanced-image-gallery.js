@@ -14,7 +14,7 @@ class EnhancedImageGallery {
             allowMultiSelect: options.allowMultiSelect !== false,
             showUpload: options.showUpload !== false,
             categories: options.categories || ['all', 'posts', 'covers', 'gallery', 'icons'],
-            serverUrl: options.serverUrl || 'http://127.0.0.1:8081',
+            serverUrl: options.serverUrl || 'http://127.0.0.1:8080',
             maxFileSize: options.maxFileSize || 10 * 1024 * 1024, // 10MB
             allowedTypes: options.allowedTypes || ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
             ...options

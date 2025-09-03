@@ -1352,7 +1352,7 @@ class ImageManager {
 
         // 检查服务器是否可用
         try {
-            const healthResponse = await fetch('http://127.0.0.1:8081/health');
+            const healthResponse = await fetch('http://127.0.0.1:8080/health');
             if (!healthResponse.ok) {
                 throw new Error('文件服务器不可用');
             }
@@ -1373,7 +1373,7 @@ class ImageManager {
         }
 
         // 上传到服务器
-        const response = await fetch('http://127.0.0.1:8081/api/images/upload', {
+        const response = await fetch('http://127.0.0.1:8080/api/upload', {
             method: 'POST',
             body: formData
         });

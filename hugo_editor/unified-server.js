@@ -76,16 +76,27 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
     try {
         const file = req.file;
         if (!file) return res.status(400).json({ error: 'No file uploaded' });
+        
         // 图片压缩与优化
-        const outputPath = path.join(file.destination, 'optimized-' + file.filename);
+        const optimizedFilename = 'optimized-' + file.filename;
+        const outputPath = path.join(file.destination, optimizedFilename);
+        
         await sharp(file.path)
             .resize({ width: 1920, height: 1080, fit: 'inside' })
             .jpeg({ quality: 85 })
             .toFile(outputPath);
-        res.json({ success: true, filename: file.filename, url: `/static/images/uploads/optimized-${file.filename}` });
+        
+        // 返回正确的图片访问路径
+        const webPath = `/images/uploads/${optimizedFilename}`;
+        res.json({ 
+            success: true, 
+            filename: optimizedFilename, 
+            url: webPath,
+            webPath: webPath,
+            markdownRef: `![${file.originalname}](${webPath})`
+        });
     } catch (err) {
         res.status(500).json({ error: err.message });
-// ...existing code...
     }
 });
 
