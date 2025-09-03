@@ -99,6 +99,7 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
         res.json({ success: true, filename: file.filename, url: `/static/images/uploads/optimized-${file.filename}` });
     } catch (err) {
         res.status(500).json({ error: err.message });
+// ...existing code...
     }
 });
 
