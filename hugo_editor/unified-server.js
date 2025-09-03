@@ -65,7 +65,25 @@ app.use((req, res, next) => {
 
 // 健康检查
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', service: 'Hugo Editor Unified Server', timestamp: new Date().toISOString() });
+    const healthData = {
+        status: 'ok',
+        service: 'Hugo Editor Unified Server',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        version: process.version,
+        environment: {
+            nodeEnv: process.env.NODE_ENV || 'development',
+            platform: process.platform,
+            arch: process.arch
+        },
+        directories: {
+            project: projectRoot,
+            editor: editorPath,
+            uploads: path.join(projectRoot, 'static', 'images', 'uploads')
+        }
+    };
+    res.json(healthData);
 });
 
 
@@ -90,19 +108,46 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '1mb' })); // 限制JSON payload大小
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+
+// 安全头中间件
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    next();
+});
 
 // 文件上传配置
 const upload = multer({
-    limits: { fileSize: 10 * 1024 * 1024 },
+    limits: { 
+        fileSize: 10 * 1024 * 1024,  // 10MB限制
+        files: 1                      // 单次只能上传1个文件
+    },
+    fileFilter: function (req, file, cb) {
+        // 只允许图片文件
+        const allowedTypes = /jpeg|jpg|png|gif|webp/;
+        const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+        const mimetype = allowedTypes.test(file.mimetype);
+        
+        if (mimetype && extname) {
+            return cb(null, true);
+        } else {
+            cb(new Error('只允许上传图片文件 (jpeg, jpg, png, gif, webp)'));
+        }
+    },
     storage: multer.diskStorage({
         destination: function (req, file, cb) {
             const dest = path.join(projectRoot, 'static', 'images', 'uploads');
             fs.mkdir(dest, { recursive: true }).then(() => cb(null, dest));
         },
         filename: function (req, file, cb) {
-            cb(null, uuidv4() + path.extname(file.originalname));
+            // 生成安全的文件名
+            const ext = path.extname(file.originalname).toLowerCase();
+            const safeName = uuidv4() + ext;
+            cb(null, safeName);
         }
     })
 });
@@ -150,12 +195,34 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 app.post('/api/save', async (req, res) => {
     try {
         const { filename, content, directory } = req.body;
-        if (!filename || !content) return res.status(400).json({ error: 'Missing filename or content' });
+        if (!filename || !content) {
+            return res.status(400).json({ error: 'Missing filename or content' });
+        }
         
-        // 支持自定义导出目录
-        let targetDir = path.join(projectRoot, directory || 'content/posts');
+        // 安全性验证
+        // 1. 验证文件名
+        const safeFilename = path.basename(filename); // 防止目录穿越
+        if (safeFilename !== filename || !safeFilename.endsWith('.md')) {
+            return res.status(400).json({ error: 'Invalid filename. Only .md files allowed.' });
+        }
+        
+        // 2. 验证目录路径
+        const allowedDirs = ['content/posts', 'content/drafts'];
+        const targetDirectory = directory || 'content/posts';
+        if (!allowedDirs.includes(targetDirectory)) {
+            return res.status(400).json({ error: 'Invalid directory path' });
+        }
+        
+        // 3. 构建安全的文件路径
+        let targetDir = path.join(projectRoot, targetDirectory);
         await fs.mkdir(targetDir, { recursive: true });
-        const filePath = path.join(targetDir, filename);
+        const filePath = path.join(targetDir, safeFilename);
+        
+        // 4. 验证路径没有穿越出项目目录
+        if (!filePath.startsWith(projectRoot)) {
+            return res.status(400).json({ error: 'Path traversal not allowed' });
+        }
+        
         await fs.writeFile(filePath, content, 'utf8');
         
         // 触发 Hugo 重建
