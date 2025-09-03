@@ -16,11 +16,11 @@ const PORT = 8080;
 const editorPath = path.resolve(__dirname);
 const projectRoot = path.resolve(__dirname, '..');
 
-// 静态文件服务（编辑器）
-app.use(express.static(editorPath));
+// Hugo 主站静态资源优先处理（public 目录）
+app.use(express.static(path.join(projectRoot, 'public')));
 
-// Hugo 主站静态服务（public 目录）
-app.use('/site', express.static(path.join(projectRoot, 'public')));
+// 编辑器静态资源（hugo_editor 目录）
+app.use(express.static(editorPath));
 
 // 日志中间件
 app.use((req, res, next) => {
