@@ -1015,6 +1015,23 @@ class HugoEditor {
             .replace(/^-+|-+$/g, '');
     }
 
+    fallbackExport() {
+        const frontMatter = this.collectFrontMatter();
+        const content = document.getElementById('markdownEditor').value;
+        const fileName = document.getElementById('fileName').value || 'untitled.md';
+        const hugoContent = this.generateHugoMarkdown(frontMatter, content);
+
+        const blob = new Blob([hugoContent], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
     // UI控制功能
     toggleSplit() {
         const previewPane = document.getElementById('previewPane');
